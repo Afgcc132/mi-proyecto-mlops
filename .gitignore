@@ -2,3 +2,17 @@ venv
 .env
 __pycache__/
 *.pyc
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.egg-info/
+dist/
+build/
+
+# Entornos virtuales
+venv/
+env/
+
+# Variables de entorno / Secretos
+.env
