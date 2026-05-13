@@ -2,7 +2,10 @@ import sys
 from ..logging.logger import logger
 
 
-class network_security_exception(Exception):
+# PEP 8 convention recommends using PascalCase for class names.
+# Renaming this class to NetworkSecurityException will fix the ImportError
+# in other modules that try to import it with that capitalization.
+class NetworkSecurityException(Exception):
     def __init__(self, error_message, error_detail:sys):
         # It's good practice to call the parent's __init__
         # We will format the detailed message here and pass it to the parent
@@ -23,5 +26,5 @@ if __name__ == "__main__":
         a = 1/0
     except Exception as e:
         logger.info("Divide by zero error")
-        raise network_security_exception(e, sys)    
+        raise NetworkSecurityException(e, sys)
     
