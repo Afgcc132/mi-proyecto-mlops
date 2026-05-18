@@ -34,16 +34,19 @@ class NetworkDataExtract():
 
     def insert_data_mongodb(self, records: list, database_name: str, collection_name: str) -> int:
         """Inserta una lista de registros en una colección de MongoDB."""
+        mongo_client = None
         try:
             # Usar variables locales es más limpio que asignar a atributos de instancia aquí.
             mongo_client = pymongo.MongoClient(MONGO_DB_URL)
             database = mongo_client[database_name]
             collection = database[collection_name]
             collection.insert_many(records)
-            mongo_client.close()
             return len(records)
         except Exception as e:
             raise NetworkSecurityException(e, sys) from e
+        finally:
+            if mongo_client:
+                mongo_client.close()
 
 
 if __name__ == '__main__':
