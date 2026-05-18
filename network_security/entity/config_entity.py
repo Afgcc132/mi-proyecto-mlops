@@ -9,7 +9,12 @@ from network_security.constant.training_pipeline import (
     DATA_INGESTION_FEATURE_STORE_DIR,
     DATA_INGESTION_INGESTED_DIR_NAME,
     TRAIN_FILE_NAME,
-    TEST_FILE_NAME
+    TEST_FILE_NAME,
+    DATA_VALIDATION_DIR_NAME,
+    DATA_VALIDATION_VALID_DIR,
+    DATA_VALIDATION_INVALID_DIR,    
+    DATA_VALIDATION_DRIFT_REPORT_DIR,
+    DATA_VALIDATION_DRIFT_REPORT_FILE_NAME
 )
 
 class TrainingPipelineConfig:
@@ -36,5 +41,29 @@ class DataIngestionConfig:
             self.ingested_dir = os.path.join(self.data_ingestion_dir, DATA_INGESTION_INGESTED_DIR_NAME)
             self.train_file_path = os.path.join(self.ingested_dir, TRAIN_FILE_NAME)
             self.test_file_path = os.path.join(self.ingested_dir, TEST_FILE_NAME)
+        except Exception as e:
+            raise NetworkSecurityException(e, sys) from e
+        
+class DataValidationConfig:
+    def __init__(self, training_pipeline_config: TrainingPipelineConfig):
+        try:
+            self.data_validation_dir = os.path.join(
+                training_pipeline_config.artifact_dir, DATA_VALIDATION_DIR_NAME
+            )
+            self.valid_train_file_path = os.path.join(
+                self.data_validation_dir, DATA_VALIDATION_VALID_DIR, TRAIN_FILE_NAME
+            )
+            self.valid_test_file_path = os.path.join(
+                self.data_validation_dir, DATA_VALIDATION_VALID_DIR, TEST_FILE_NAME
+            )
+            self.invalid_train_file_path = os.path.join(
+                self.data_validation_dir, DATA_VALIDATION_INVALID_DIR, TRAIN_FILE_NAME
+            )
+            self.invalid_test_file_path = os.path.join(
+                self.data_validation_dir, DATA_VALIDATION_INVALID_DIR, TEST_FILE_NAME
+            )
+            self.drift_report_file_path = os.path.join(
+                self.data_validation_dir, DATA_VALIDATION_DRIFT_REPORT_DIR, DATA_VALIDATION_DRIFT_REPORT_FILE_NAME
+            )
         except Exception as e:
             raise NetworkSecurityException(e, sys) from e

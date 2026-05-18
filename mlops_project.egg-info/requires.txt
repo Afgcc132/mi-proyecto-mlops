@@ -6,3 +6,6 @@ matplotlib
 seaborn
 pymongo
 certifi
+pymongo[srv]==4.17.0
+dill
+PyYAML
