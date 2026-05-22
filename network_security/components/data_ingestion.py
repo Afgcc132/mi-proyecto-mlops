@@ -16,10 +16,7 @@ from network_security.constant.training_pipeline import (
     DATA_INGESTION_COLECTION_NAME,
     DATA_INGESTION_TRAIN_TEST_SPLIT_RATIO
 )
-from dotenv import load_dotenv
-load_dotenv()  # Carga las variables de entorno desde el archivo .env
-
-MONGO_DB_URL = os.getenv("MONGO_DB_URL")
+MONGO_DB_URL = os.getenv("MONGO_DB_URL") # This will now be loaded by main.py
 
 class DataIngestion:
     def __init__(self, data_ingestion_config: DataIngestionConfig):
@@ -36,6 +33,11 @@ class DataIngestion:
             collection = db[collection_name]
             data = list(collection.find())
             df = pd.DataFrame(data)
+            
+            if df.empty:
+                raise ValueError(f"No data found in MongoDB collection: '{collection_name}' in database: '{database_name}'. "
+                                 "Please ensure the collection is not empty before running the pipeline.")
+
             # El campo '_id' de MongoDB no es necesario para el entrenamiento del modelo.
             if '_id' in df.columns:
                 df = df.drop(columns=['_id'])

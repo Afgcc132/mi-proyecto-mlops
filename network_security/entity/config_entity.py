@@ -14,7 +14,10 @@ from network_security.constant.training_pipeline import (
     DATA_VALIDATION_VALID_DIR,
     DATA_VALIDATION_INVALID_DIR,    
     DATA_VALIDATION_DRIFT_REPORT_DIR,
-    DATA_VALIDATION_DRIFT_REPORT_FILE_NAME
+    DATA_VALIDATION_DRIFT_REPORT_FILE_NAME,
+    DATA_TRANSFORMATION_DIR_NAME,
+    DATA_TRANSFORMATION_TRANSFORMED_DIR,
+    DATA_TRANSFORMATION_PREPROCESSOR_DIR
 )
 
 class TrainingPipelineConfig:
@@ -67,3 +70,23 @@ class DataValidationConfig:
             )
         except Exception as e:
             raise NetworkSecurityException(e, sys) from e
+
+class DataTransformationConfig:
+    def __init__(self, training_pipeline_config: TrainingPipelineConfig):
+        try:
+            self.data_transformation_dir  = os.path.join(training_pipeline_config.artifact_dir, DATA_TRANSFORMATION_DIR_NAME
+            )
+            self.transformed_train_file_path = os.path.join(
+                self.data_transformation_dir, DATA_TRANSFORMATION_TRANSFORMED_DIR, TRAIN_FILE_NAME.replace("csv", "npy")
+            )
+            self.transformed_test_file_path = os.path.join(
+                self.data_transformation_dir, DATA_TRANSFORMATION_TRANSFORMED_DIR, TEST_FILE_NAME.replace("csv", "npy")
+            )
+            self.preprocessor_object_file_path = os.path.join(
+                self.data_transformation_dir, DATA_TRANSFORMATION_PREPROCESSOR_DIR, "preprocessor.pkl"
+            )
+        except Exception as e:
+            raise NetworkSecurityException(e, sys) from e
+
+        
+      

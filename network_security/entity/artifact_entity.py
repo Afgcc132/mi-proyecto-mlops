@@ -15,3 +15,9 @@ class DataValidationArtifact:
     schema_file_path: str
     invalid_train_file_path: str = None
     invalid_test_file_path: str = None
+
+@dataclass
+class DataTransformationArtifact:
+    transformed_train_file_path: str
+    transformed_test_file_path: str
+    preprocessed_object_file_path: str

@@ -1,7 +1,0 @@
-[2026-05-18 19:36:06,770] 42 mlops_project_logger - INFO - Datos exportados de la colección NetworkData en la base de datos KRISHAI
-[2026-05-18 19:36:06,969] 56 mlops_project_logger - INFO - Datos guardados en el feature store: Artifact\network_security\05_18_2026_19_35_57\data_ingestion\feature_store\phisingData.csv
-[2026-05-18 19:36:06,973] 64 mlops_project_logger - INFO - Datos divididos en conjuntos de entrenamiento y prueba con una proporción de 0.2
-[2026-05-18 19:36:07,047] 87 mlops_project_logger - INFO - Datos de entrenamiento guardados en: Artifact\network_security\05_18_2026_19_35_57\data_ingestion\ingested\train.csv
-[2026-05-18 19:36:07,049] 88 mlops_project_logger - INFO - Datos de prueba guardados en: Artifact\network_security\05_18_2026_19_35_57\data_ingestion\ingested\test.csv
-[2026-05-18 19:36:07,050] 15 mlops_project_logger - INFO - Data Ingestion artifact: DataIngestionArtifact(trained_file_path='Artifact\\network_security\\05_18_2026_19_35_57\\data_ingestion\\ingested\\train.csv', test_file_path='Artifact\\network_security\\05_18_2026_19_35_57\\data_ingestion\\ingested\\test.csv')
-[2026-05-18 19:36:07,238] 63 mlops_project_logger - INFO - Reporte de data drift guardado en: Artifact\network_security\05_18_2026_19_35_57\data_validation\drift_report\report.yaml

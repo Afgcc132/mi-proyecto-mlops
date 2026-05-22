@@ -10,6 +10,11 @@ from dotenv import load_dotenv
 # Además, el logger se exporta como 'logger', no 'logging'.
 from network_security.exception.exception import NetworkSecurityException
 from network_security.logging.logger import logger
+from network_security.constant.training_pipeline import (
+    DATA_INGESTION_DATABASE_NAME,
+    DATA_INGESTION_COLECTION_NAME,
+    FILE_NAME
+)
 
 # Cargar variables de entorno desde el archivo .env
 load_dotenv()
@@ -40,6 +45,11 @@ class NetworkDataExtract():
             mongo_client = pymongo.MongoClient(MONGO_DB_URL)
             database = mongo_client[database_name]
             collection = database[collection_name]
+            # Limpiar la colección para evitar datos duplicados en ejecuciones repetidas
+            logger.info(f"Limpiando la colección '{collection_name}' en la base de datos '{database_name}'...")
+            collection.delete_many({})
+            logger.info("Colección limpiada.")
+
             collection.insert_many(records)
             return len(records)
         except Exception as e:
@@ -51,13 +61,13 @@ class NetworkDataExtract():
 
 if __name__ == '__main__':
     # Usar os.path.join para compatibilidad de rutas entre sistemas operativos
-    FILE_PATH = os.path.join("Network_Data", "phisingData.csv")
-    DATABASE = "KRISHAI"
-    COLLECTION = "NetworkData"
+    FILE_PATH = os.path.join("Network_Data", FILE_NAME)
+    DATABASE = DATA_INGESTION_DATABASE_NAME
+    COLLECTION = DATA_INGESTION_COLECTION_NAME
     networkobj = NetworkDataExtract()
     records = networkobj.csv_to_json_convertor(file_path=FILE_PATH)
     logger.info(f"Se encontraron {len(records)} registros en el archivo CSV.")
     # Imprimir todos los registros puede ser muy verboso. Considera imprimir un resumen.
     # print(records)
     no_of_records = networkobj.insert_data_mongodb(records, DATABASE, COLLECTION)
-    print(f"Se insertaron {no_of_records} registros exitosamente.")
+    logger.info(f"Se insertaron {no_of_records} registros exitosamente en la colección '{COLLECTION}'.")

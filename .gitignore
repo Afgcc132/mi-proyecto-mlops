@@ -12,3 +12,14 @@ env/
 
 # Variables de entorno / Secretos
 .env
+
+# Ignorar la carpeta de logs por completo
+logs/
+*.log
+
+# Aprovechando que estás en MLOps, también deberías ignorar:
+Artifact/
+.env
+__pycache__/
+*.pkl
+*.npy
