@@ -12,4 +12,5 @@ Requires-Dist: certifi
 Requires-Dist: pymongo[srv]==4.17.0
 Requires-Dist: dill
 Requires-Dist: PyYAML
+Requires-Dist: mlflow
 Dynamic: requires-dist
