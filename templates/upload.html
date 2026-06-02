@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>MLOps Predictor</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body class="container mt-5">
+    <div class="card shadow p-4">
+        <h1 class="mb-4">Network Security Predictor</h1>
+        <p class="text-muted">Sube un archivo CSV con las características de red para obtener las predicciones del modelo.</p>
+        
+        <form action="/predict" method="post" enctype="multipart/form-data">
+            <div class="mb-3">
+                <input class="form-control" type="file" name="file" accept=".csv" required>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">Analizar y Predecir</button>
+        </form>
+        
+        <div class="mt-4 alert alert-info">
+            <strong>Nota:</strong> Los resultados detallados se exportarán automáticamente a <code>prediction_output/output.csv</code>.
+        </div>
+    </div>
+</body>
+</html>

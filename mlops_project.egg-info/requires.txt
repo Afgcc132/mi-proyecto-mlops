@@ -10,3 +10,6 @@ pymongo[srv]==4.17.0
 dill
 PyYAML
 mlflow
+fastapi
+uvicorn
+dagshub

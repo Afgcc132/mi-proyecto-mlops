@@ -104,6 +104,18 @@ class ModelTrainer:
             # Opcional: Registrar también el objeto NetworkModel completo (con preprocesador) en MLflow
             mlflow.log_artifact(self.model_trainer_config.trained_model_file_path, artifact_path="final_model")
 
+            # Exportar a la carpeta 'final_model' en la raíz para facilitar el despliegue
+            final_model_dir = "final_model"
+            os.makedirs(final_model_dir, exist_ok=True)
+
+            # Guardamos preprocessor.pkl y model.pkl por separado
+            save_object(file_path=os.path.join(final_model_dir, "preprocessor.pkl"), obj=preprocessor)
+            save_object(file_path=os.path.join(final_model_dir, "model.pkl"), obj=best_model)
+            # También guardamos el objeto NetworkModel completo por si lo necesitas
+            save_object(file_path=os.path.join(final_model_dir, "network_model.pkl"), obj=model)
+            
+            logger.info(f"Artefactos finales exportados a la carpeta: {final_model_dir}")
+
             model_trainer_artifact = ModelTrainerArtifact(
                 trained_model_file_path=self.model_trainer_config.trained_model_file_path,
                 train_metric_artifact=classification_train_metric,

@@ -13,4 +13,7 @@ Requires-Dist: pymongo[srv]==4.17.0
 Requires-Dist: dill
 Requires-Dist: PyYAML
 Requires-Dist: mlflow
+Requires-Dist: fastapi
+Requires-Dist: uvicorn
+Requires-Dist: dagshub
 Dynamic: requires-dist
