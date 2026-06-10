@@ -19,11 +19,22 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Lint code
-        run: echo "Sugerencia - Ejecutar flake8 o black aquí"
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
 
-      - name: Run unit tests
-        run: echo "Sugerencia - Ejecutar pytest aquí"
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Lint with flake8
+        run: |
+          pip install flake8
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+
+      # Agregamos un paso de prueba simple para confirmar que el CI funciona
+      - name: Run simple smoke test
+        run: python -c "import network_security; print('Importación exitosa')"
 
   build-and-push-ecr-image:
     name: Continuous Delivery
@@ -59,12 +70,12 @@ jobs:
           # Construir la imagen de docker y subirla a ECR
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
           docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
-          echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
+          echo "image=$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG" >> $GITHUB_OUTPUT
 
   Continuous-Deployment:
     name: Continuous Deployment
     needs: build-and-push-ecr-image
-    runs-on: self-hosted
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v3
@@ -81,9 +92,20 @@ jobs:
         uses: aws-actions/amazon-ecr-login@v1
       
       - name: Pull latest image
-        run: |
-         docker pull ${{ secrets.AWS_ECR_LOGIN_URI }}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_NAME }}
+        run: docker pull $ECR_REGISTRY/$ECR_REPOSITORY:latest
          
-      - name: Run Docker Image to serve users
+      - name: Clean and Run Docker Image
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: ${{ secrets.ECR_REPOSITORY_NAME }}
         run: |
-         docker run -d -p 8080:8000 --ipc="host" --name=networksecurity -e MONGO_DB_URL=${{ secrets.MONGO_DB_URL }} -e AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} -e AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} -e AWS_REGION=${{ secrets.AWS_REGION }} ${{ secrets.AWS_ECR_LOGIN_URI }}/${{ secrets.ECR_REPOSITORY_NAME }}:latest
+         docker rm -f networksecurity || true
+         docker run -d -p 8080:8000 --ipc="host" --name=networksecurity \
+         -e MONGO_DB_URL=${{ secrets.MONGO_DB_URL }} \
+         -e AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }} \
+         -e AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }} \
+         -e AWS_REGION=${{ secrets.AWS_REGION }} \
+         $ECR_REGISTRY/$ECR_REPOSITORY:latest
