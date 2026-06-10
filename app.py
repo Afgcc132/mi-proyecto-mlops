@@ -22,15 +22,18 @@ import pandas as pd
 
 from network_security.utils.main_utils.utils import load_object
 
-client = pymongo.MongoClient(mongodb_url, tlsCAFile=ca)
-
 from network_security.constant.training_pipeline import (
     DATA_INGESTION_COLECTION_NAME,
     DATA_INGESTION_DATABASE_NAME
 )
 
-database = client[DATA_INGESTION_DATABASE_NAME]
-collection = database[DATA_INGESTION_COLECTION_NAME] 
+client = None
+database = None
+collection = None
+if mongodb_url:
+    client = pymongo.MongoClient(mongodb_url, tlsCAFile=ca)
+    database = client[DATA_INGESTION_DATABASE_NAME]
+    collection = database[DATA_INGESTION_COLECTION_NAME]
 
 app = FastAPI()
 origin = ["*"]
@@ -47,13 +50,24 @@ templates = Jinja2Templates(directory="./templates")
 
 # Cargamos el modelo y el preprocesador una sola vez al iniciar la aplicación.
 # Esto optimiza el rendimiento y evita cargar archivos pesados en cada petición.
-PREPROCESSOR = load_object("final_model/preprocessor.pkl")
-MODEL = load_object("final_model/model.pkl")
+MODEL_DIR = os.getenv("MODEL_DIR", "final_model")
+PREPROCESSOR_PATH = os.path.join(MODEL_DIR, "preprocessor.pkl")
+MODEL_PATH = os.path.join(MODEL_DIR, "model.pkl")
+
+try:
+    logger.info(f"Cargando artefactos desde {MODEL_DIR}...")
+    PREPROCESSOR = load_object(PREPROCESSOR_PATH)
+    MODEL = load_object(MODEL_PATH)
+    logger.info("Modelo y preprocesador cargados exitosamente.")
+except Exception as e:
+    logger.error(f"Error crítico: No se pudieron cargar los artefactos del modelo. Ruta: {MODEL_DIR}. Error: {e}")
+    # En producción, podrías querer que la app falle aquí o use un modelo por defecto
+
 NETWORK_MODEL_ESTIMATOR = NetworkModel(preprocessor=PREPROCESSOR, model=MODEL)
 
 @app.get("/", tags=["auth"])
 async def index(request: Request):
-    return templates.TemplateResponse("upload.html", {"request": request})
+    return templates.TemplateResponse(request, "upload.html")
 
 @app.get("/train")
 async def train_route(background_tasks: BackgroundTasks):
@@ -86,7 +100,7 @@ async def predict_route(request: Request,  file: UploadFile = File(...)):
         
         logger.info(f"Predicción completada. Registros procesados: {len(df)}")
         table_html = df.to_html(classes="table table-striped")
-        return templates.TemplateResponse("table.html", {"request": request, "table_html": table_html})
+        return templates.TemplateResponse(request, "table.html", {"table_html": table_html})
     except Exception as e:
         raise NetworkSecurityException(e, sys) from e
 

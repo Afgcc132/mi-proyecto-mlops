@@ -12,6 +12,8 @@ PyYAML
 mlflow
 fastapi
 uvicorn
+jinja2
+python-multipart
 dagshub
 
 

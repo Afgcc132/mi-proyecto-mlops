@@ -15,13 +15,14 @@ os.makedirs(logs_path, exist_ok=True)
 
 LOG_FILE_PATH = os.path.join(logs_path, LOG_FILE)
 
+# Configuración dual: Archivo para local y Consola para AWS/Docker
 logging.basicConfig(
-    filename=LOG_FILE_PATH,
-    level=logging.INFO, 
-    format="[%(asctime)s] %(lineno)d %(name)s - %(levelname)s - %(message)s",       
-    # Cambiado a 'a' (append) para evitar la sobreescritura accidental de logs
-    # si el script se ejecuta varias veces en el mismo segundo.
-    filemode="a"
+    level=logging.INFO,
+    format="[%(asctime)s] %(lineno)d %(name)s - %(levelname)s - %(message)s",
+    handlers=[
+        logging.FileHandler(LOG_FILE_PATH),
+        logging.StreamHandler() # Esto permite que los logs se vean en AWS CloudWatch/Docker logs
+    ]
 )
 
 # Create a logger instance that can be imported by other modules

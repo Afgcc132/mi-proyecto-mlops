@@ -17,10 +17,13 @@ env/
 logs/
 *.log
 
-# Aprovechando que estás en MLOps, también deberías ignorar:
-Artifact/
-.env
-__pycache__/
-*.pkl
+# MLOps Artifacts
+artifact/
+prediction_output/
+
+# Ignorar archivos pesados o temporales, pero PERMITIR el modelo final
 *.npy
 mlflow.db
+
+# Si decides incluir el modelo en el repo (no recomendado para archivos >50MB, pero útil para empezar)
+!final_model/*.pkl
